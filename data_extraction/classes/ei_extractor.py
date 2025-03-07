@@ -1,4 +1,5 @@
 import random
+import pandas as pd
 
 class EIExtractor:
     """
@@ -75,9 +76,9 @@ class EIExtractor:
 
     def get_data(self):
         return (
-            self.true_data,
-            self.ie_counter_example_data,
-            self.ez_counter_example_data,
-            self.ze_counter_example_data,
-            self.false_data
+            pd.DataFrame(self.true_data),
+            pd.DataFrame(self.ie_counter_example_data),
+            pd.DataFrame(self.ez_counter_example_data),
+            pd.DataFrame(self.ze_counter_example_data),
+            pd.DataFrame(self.false_data)
         )
