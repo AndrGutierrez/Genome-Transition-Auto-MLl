@@ -107,21 +107,25 @@ class Extraction:
             - EI (IE) counter example: ei/data_ie_counter_example.csv
             - EI (EZ) counter example: ei/data_ez_counter_example.csv
             - EI (ZE) counter example: ei/data_ze_counter_example.csv
+            - EI sample combined: ei/data_sample_combined.csv
             - IE true data:      ie/data_ie.csv
             - IE negative data:  ie/data_ie_random.csv
             - IE (EI) counter example: ie/data_ei_counter_example.csv
             - IE (EZ) counter example: ie/data_ez_counter_example.csv
             - IE (ZE) counter example: ie/data_ze_counter_example.csv
+            - IE sample combined: ie/data_sample_combined.csv
             - ZE true data:      ze/data_ze.csv
             - ZE (IE) counter example: ze/data_ie_counter_example.csv
             - ZE (EI) counter example: ze/data_ei_counter_example.csv
             - ZE (EZ) counter example: ze/data_ez_counter_example.csv
             - ZE negative data:  ze/data_ze_random.csv
+            - ZE sample combined: ze/data_sample_combined.csv
             - EZ true data:      ez/data_ez.csv
             - EZ (IE) counter example: ez/data_ie_counter_example.csv
             - EZ (EI) counter example: ez/data_ei_counter_example.csv
             - EZ (ZE) counter example: ez/data_ze_counter_example.csv
             - EZ negative data:  ez/data_ez_random.csv
+            - EZ sample combined: ez/data_sample_combined.csv
         """
 
         if not os.path.exists(self.output_path):
