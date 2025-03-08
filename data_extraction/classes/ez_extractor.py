@@ -1,4 +1,5 @@
 import random
+import pandas as pd
 
 class EZExtractor:
     """
@@ -14,6 +15,9 @@ class EZExtractor:
     """
     def __init__(self):
         self.true_data = []
+        self.ei_counter_example_data = []
+        self.ie_counter_example_data = []
+        self.ze_counter_example_data = []
         self.false_data = []
 
     def extract_true(self, gen_id, chromosome, global_start, sequence, exons):
@@ -28,5 +32,47 @@ class EZExtractor:
         false_seq = "".join(random.choice(nucleotides) for _ in range(550))
         self.false_data.append([gen_id, chromosome, global_start, None, *list(false_seq)])
 
+    def extract_ei_counter_example(self, gen_id, chromosome, global_start, sequence, exons):
+        for i in range(len(exons) - 1):
+            exon_end = exons[i][1]
+            intron_start = exon_end + 1
+
+            # Check if there are enough characters and the intron starts with 'gt'
+            if intron_start + 1 < len(sequence) and sequence[intron_start:intron_start + 2] == "gt":
+                # Extract 5 nucleotides to the left and 7 to the right
+                left = sequence[max(0, intron_start - 5):intron_start]
+                right = sequence[intron_start:intron_start + 7]
+                transition_seq = left + right  # 12 characters
+                expanded_transition_seq = (transition_seq * 46)[:550]  # 550 characters
+                self.ei_counter_example_data.append(
+                    [gen_id, chromosome, global_start, exon_end, *list(expanded_transition_seq)])
+
+    def extract_ie_counter_example(self, gen_id, chromosome, global_start, sequence, exons):
+        for i in range(len(exons) - 1):
+            exon_start = exons[i + 1][0]
+            intron_end = exon_start - 1
+
+            # Check if there are enough characters and the intron ends with 'ag'
+            if intron_end - 1 >= 0 and sequence[intron_end - 1:intron_end + 1] == "ag":
+                left = sequence[max(0, intron_end - 100):intron_end]
+                right = sequence[intron_end:intron_end + 5]
+                transition_seq = left + right  # 100 + 5 = 105 characters
+                expanded_transition_seq = (transition_seq * 6)[:550] # 550 characters
+                self.ie_counter_example_data.append(
+                    [gen_id, chromosome, global_start, None, *list(expanded_transition_seq)])
+
+    def extract_ze_counter_example(self, gen_id, chromosome, global_start, sequence, exons):
+        exon_start = exons[0][0]
+        left = sequence[max(0, exon_start - 500):exon_start]
+        right = sequence[exon_start:exon_start + 50]
+        transition_seq = left + right  # 500 + 50 = 550 characters
+        self.ze_counter_example_data.append([gen_id, chromosome, global_start, None, *list(transition_seq)])
+
     def get_data(self):
-        return self.true_data, self.false_data
+        return (
+            pd.DataFrame(self.true_data),
+            pd.DataFrame(self.ei_counter_example_data),
+            pd.DataFrame(self.ie_counter_example_data),
+            pd.DataFrame(self.ze_counter_example_data),
+            pd.DataFrame(self.false_data)
+        )

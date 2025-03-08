@@ -28,10 +28,37 @@ The extraction is performed using a Jupyter Notebook (`genomic_data.ipynb`) loca
 project_root/
 │
 ├── data/
-│   ├── data_ei.csv        # Extracted Exon → Intron transitions
-│   ├── data_ie.csv        # Extracted Intron → Exon transitions
-│   ├── data_ze.csv        # Extracted Intergenic Zone → First Exon transitions
-│   └── data_ez.csv        # Extracted Last Exon → Intergenic Zone transitions
+│   ├── ei/
+│   │   ├── data_ei.csv                  # EI True Data
+│   │   ├── data_ei_random.csv           # EI Negative Data
+│   │   ├── data_ie_counter_example.csv  # EI (IE) Counter Example
+│   │   ├── data_ez_counter_example.csv  # EI (EZ) Counter Example
+│   │   ├── data_ze_counter_example.csv  # EI (ZE) Counter Example
+│   │   └── data_sample_combined.csv     # EI Combined Samples (Negative and Counter Examples)
+│   │
+│   ├── ie/
+│   │   ├── data_ie.csv                  # IE True Data
+│   │   ├── data_ie_random.csv           # IE Negative Data
+│   │   ├── data_ei_counter_example.csv  # IE (EI) Counter Example
+│   │   ├── data_ez_counter_example.csv  # IE (EZ) Counter Example
+│   │   ├── data_ze_counter_example.csv  # IE (ZE) Counter Example
+│   │   └── data_sample_combined.csv     # IE Combined Samples (Negative and Counter Examples)
+│   │
+│   ├── ze/
+│   │   ├── data_ze.csv                  # ZE True Data
+│   │   ├── data_ze_random.csv           # ZE Negative Data
+│   │   ├── data_ie_counter_example.csv  # ZE (IE) Counter Example
+│   │   ├── data_ei_counter_example.csv  # ZE (EI) Counter Example
+│   │   ├── data_ez_counter_example.csv  # ZE (EZ) Counter Example
+│   │   └── data_sample_combined.csv     # ZE Combined Samples (Negative and Counter Examples)
+│   │
+│   └── ez/
+│       ├── data_ez.csv                  # EZ True Data
+│       ├── data_ez_random.csv           # EZ Negative Data
+│       ├── data_ie_counter_example.csv  # EZ (IE) Counter Example
+│       ├── data_ei_counter_example.csv  # EZ (EI) Counter Example
+│       ├── data_ze_counter_example.csv  # EZ (ZE) Counter Example
+│       └── data_sample_combined.csv     # EZ Combined Samples (Negative and Counter Examples)
 │
 ├── data_ensembl/
 │   └── 21-1-46709983.txt  # Raw Ensembl data file (or test.txt for testing)

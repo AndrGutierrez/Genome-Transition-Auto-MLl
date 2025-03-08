@@ -5,6 +5,7 @@ from data_extraction.classes.ei_extractor import EIExtractor
 from data_extraction.classes.ie_extractor import IEExtractor
 from data_extraction.classes.ze_extractor import ZEExtractor
 from data_extraction.classes.ez_extractor import EZExtractor
+import os
 
 class Extraction:
     """
@@ -69,18 +70,30 @@ class Extraction:
                     for exons in exons_list:
                         # EI extraction: extract true transitions and generate false examples.
                         self.ei_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
+                        self.ei_extractor.extract_ie_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ei_extractor.extract_ez_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ei_extractor.extract_ze_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ei_extractor.extract_false_random(gen_id, chromosome, global_start)
 
                         # IE extraction
                         self.ie_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
+                        self.ie_extractor.extract_ei_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ie_extractor.extract_ez_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ie_extractor.extract_ze_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ie_extractor.extract_false_random(gen_id, chromosome, global_start)
 
                         # ZE extraction
                         self.ze_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
+                        self.ze_extractor.extract_ei_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ze_extractor.extract_ie_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ze_extractor.extract_ez_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ze_extractor.extract_false_random(gen_id, chromosome, global_start)
 
                         # EZ extraction
                         self.ez_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
+                        self.ez_extractor.extract_ei_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ez_extractor.extract_ie_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ez_extractor.extract_ze_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ez_extractor.extract_false_random(gen_id, chromosome, global_start)
             index += 1
 
@@ -89,55 +102,202 @@ class Extraction:
         Save the extracted data to CSV files separately for true and negative (false) examples.
 
         File naming convention:
-          - EI true data:      data_ei.csv
-          - EI negative data:  data_ei_random.csv
-          - IE true data:      data_ie.csv
-          - IE negative data:  data_ie_random.csv
-          - ZE true data:      data_ze.csv
-          - ZE negative data:  data_ze_random.csv
-          - EZ true data:      data_ez.csv
-          - EZ negative data:  data_ez_random.csv
+            - EI true data:      ei/data_ei.csv
+            - EI negative data:  ei/data_ei_random.csv
+            - EI (IE) counter example: ei/data_ie_counter_example.csv
+            - EI (EZ) counter example: ei/data_ez_counter_example.csv
+            - EI (ZE) counter example: ei/data_ze_counter_example.csv
+            - EI sample combined: ei/data_sample_combined.csv
+            - IE true data:      ie/data_ie.csv
+            - IE negative data:  ie/data_ie_random.csv
+            - IE (EI) counter example: ie/data_ei_counter_example.csv
+            - IE (EZ) counter example: ie/data_ez_counter_example.csv
+            - IE (ZE) counter example: ie/data_ze_counter_example.csv
+            - IE sample combined: ie/data_sample_combined.csv
+            - ZE true data:      ze/data_ze.csv
+            - ZE (IE) counter example: ze/data_ie_counter_example.csv
+            - ZE (EI) counter example: ze/data_ei_counter_example.csv
+            - ZE (EZ) counter example: ze/data_ez_counter_example.csv
+            - ZE negative data:  ze/data_ze_random.csv
+            - ZE sample combined: ze/data_sample_combined.csv
+            - EZ true data:      ez/data_ez.csv
+            - EZ (IE) counter example: ez/data_ie_counter_example.csv
+            - EZ (EI) counter example: ez/data_ei_counter_example.csv
+            - EZ (ZE) counter example: ez/data_ze_counter_example.csv
+            - EZ negative data:  ez/data_ez_random.csv
+            - EZ sample combined: ez/data_sample_combined.csv
         """
+
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
+
         # EI
-        ei_true, ei_negative = self.ei_extractor.get_data()
-        pd.DataFrame(ei_true).to_csv(
-            f"{self.output_path}/data_ei.csv", index=False,
+        if not os.path.exists(self.output_path + '/ei'):
+            os.makedirs(self.output_path + '/ei')
+        (
+            ei_true,
+            ei_ie_counter_example,
+            ei_ez_counter_example,
+            ei_ze_counter_example,
+            ei_negative
+        )  = self.ei_extractor.get_data()
+        ei_true.to_csv(
+            f"{self.output_path}/ei/data_ei.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)]
         )
-        pd.DataFrame(ei_negative).to_csv(
-            f"{self.output_path}/data_ei_random.csv", index=False,
+        ei_ie_counter_example.to_csv(
+            f"{self.output_path}/ei/data_ie_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)]
+        )
+        ei_ez_counter_example.to_csv(
+            f"{self.output_path}/ei/data_ez_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)]
+        )
+        ei_ze_counter_example.to_csv(
+            f"{self.output_path}/ei/data_ze_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)]
+        )
+        ei_negative.to_csv(
+            f"{self.output_path}/ei/data_ei_random.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)]
+        )
+        self.__generate_combined_sample_dataset([
+            ei_true,
+            ei_ie_counter_example,
+            ei_ez_counter_example,
+            ei_ze_counter_example,
+            ei_negative
+        ]).to_csv(
+            f"{self.output_path}/ei/data_sample_combined.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)]
         )
 
         # IE
-        ie_true, ie_negative = self.ie_extractor.get_data()
-        pd.DataFrame(ie_true).to_csv(
-            f"{self.output_path}/data_ie.csv", index=False,
+        if not os.path.exists(self.output_path + '/ie'):
+            os.makedirs(self.output_path + '/ie')
+        (
+            ie_true,
+            ie_ei_counter_example,
+            ie_ez_counter_example,
+            ie_ze_counter_example,
+            ie_negative
+        ) = self.ie_extractor.get_data()
+        ie_true.to_csv(
+            f"{self.output_path}/ie/data_ie.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)]
         )
-        pd.DataFrame(ie_negative).to_csv(
-            f"{self.output_path}/data_ie_random.csv", index=False,
+        ie_ei_counter_example.to_csv(
+            f"{self.output_path}/ie/data_ei_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)]
+        )
+        ie_ez_counter_example.to_csv(
+            f"{self.output_path}/ie/data_ez_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)]
+        )
+        ie_ze_counter_example.to_csv(
+            f"{self.output_path}/ie/data_ze_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)]
+        )
+        ie_negative.to_csv(
+            f"{self.output_path}/ie/data_ie_random.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)]
+        )
+        self.__generate_combined_sample_dataset([
+            ie_true,
+            ie_ei_counter_example,
+            ie_ez_counter_example,
+            ie_ze_counter_example,
+            ie_negative
+        ]).to_csv(
+            f"{self.output_path}/ie/data_sample_combined.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)]
         )
 
         # ZE
-        ze_true, ze_negative = self.ze_extractor.get_data()
-        pd.DataFrame(ze_true).to_csv(
-            f"{self.output_path}/data_ze.csv", index=False,
+        if not os.path.exists(self.output_path + '/ze'):
+            os.makedirs(self.output_path + '/ze')
+        (
+            ze_true,
+            ze_ei_counter_example,
+            ze_ie_counter_example,
+            ze_ez_counter_example,
+            ze_negative
+        ) = self.ze_extractor.get_data()
+        ze_true.to_csv(
+            f"{self.output_path}/ze/data_ze.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)]
         )
-        pd.DataFrame(ze_negative).to_csv(
-            f"{self.output_path}/data_ze_random.csv", index=False,
+        ze_ei_counter_example.to_csv(
+            f"{self.output_path}/ze/data_ei_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)]
+        )
+        ze_ie_counter_example.to_csv(
+            f"{self.output_path}/ze/data_ie_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)]
+        )
+        ze_ez_counter_example.to_csv(
+            f"{self.output_path}/ze/data_ez_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)]
+        )
+        ze_negative.to_csv(
+            f"{self.output_path}/ze/data_ze_random.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)]
+        )
+        self.__generate_combined_sample_dataset([
+            ze_true,
+            ze_ei_counter_example,
+            ze_ie_counter_example,
+            ze_ez_counter_example,
+            ze_negative
+        ]).to_csv(
+            f"{self.output_path}/ze/data_sample_combined.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)]
         )
 
         # EZ
-        ez_true, ez_negative = self.ez_extractor.get_data()
-        pd.DataFrame(ez_true).to_csv(
-            f"{self.output_path}/data_ez.csv", index=False,
+        if not os.path.exists(self.output_path + '/ez'):
+            os.makedirs(self.output_path + '/ez')
+        (
+            ez_true,
+            ez_ei_counter_example,
+            ez_ie_counter_example,
+            ez_ze_counter_example,
+            ez_negative
+        ) = self.ez_extractor.get_data()
+        ez_true.to_csv(
+            f"{self.output_path}/ez/data_ez.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)]
         )
-        pd.DataFrame(ez_negative).to_csv(
-            f"{self.output_path}/data_ez_random.csv", index=False,
+        ez_ei_counter_example.to_csv(
+            f"{self.output_path}/ez/data_ei_counter_example.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)]
         )
+        ez_ie_counter_example.to_csv(
+            f"{self.output_path}/ez/data_ie_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)]
+        )
+        ez_ze_counter_example.to_csv(
+            f"{self.output_path}/ez/data_ze_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)]
+        )
+        ez_negative.to_csv(
+            f"{self.output_path}/ez/data_ez_random.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)]
+        )
+        self.__generate_combined_sample_dataset([
+            ez_true,
+            ez_ei_counter_example,
+            ez_ie_counter_example,
+            ez_ze_counter_example,
+            ez_negative
+        ]).to_csv(
+            f"{self.output_path}/ez/data_sample_combined.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)]
+        )
+
+    def __generate_combined_sample_dataset(self, list_of_datasets) -> pd.DataFrame:
+        """
+        Combine all extracted data into a single dataset. And return a random sample of 30% of combined dataset.
+        """
+        combined_data = pd.concat(list_of_datasets)
+        return combined_data.sample(frac=0.3)
