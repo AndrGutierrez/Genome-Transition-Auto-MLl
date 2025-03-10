@@ -46,27 +46,35 @@ class IEExtractor:
 
             # Check if there are enough characters and the intron starts with 'gt'
             if intron_start + 1 < len(sequence) and sequence[intron_start:intron_start + 2] == "gt":
-                # Extract 5 nucleotides to the left and 7 to the right
-                left = sequence[max(0, intron_start - 5):intron_start]
-                right = sequence[intron_start:intron_start + 7]
-                transition_seq = left + right # 12 characters
-                expanded_transition_seq = (transition_seq * 9)[:105] # 105 characters
+                left = sequence[max(0, intron_start - 100):intron_start]
+                right = sequence[intron_start:intron_start + 5]
+                expanded_transition_seq = left + right #  100 + 5 = 105 characters
+                # Insert ag to simulate the end of the intron
+                expanded_transition_seq = list(expanded_transition_seq)
+                expanded_transition_seq[99:101] = ["a", "g"]
+                expanded_transition_seq = "".join(expanded_transition_seq)
                 self.ei_counter_example_data.append([gen_id, chromosome, global_start, exon_end, *list(expanded_transition_seq)])
 
     def extract_ez_counter_example(self, gen_id, chromosome, global_start, sequence, exons):
         exon_end = exons[-1][1]
-        left = sequence[max(0, exon_end - 50):exon_end]
-        right = sequence[exon_end:exon_end + 500]
-        transition_seq = left + right # 500 + 50 = 550 characters
-        reduced_transition_seq = transition_seq[-105:] # 105 characters
+        left = sequence[max(0, exon_end - 100):exon_end]
+        right = sequence[exon_end:exon_end + 5]
+        reduced_transition_seq = left + right # 100 + 5 = 105 characters
+        # Insert ag to simulate the end of the intron
+        reduced_transition_seq = list(reduced_transition_seq)
+        reduced_transition_seq[99:101] = ["a", "g"]
+        reduced_transition_seq = "".join(reduced_transition_seq)
         self.ez_counter_example_data.append([gen_id, chromosome, global_start, None, *list(reduced_transition_seq)])
 
     def extract_ze_counter_example(self, gen_id, chromosome, global_start, sequence, exons):
         exon_start = exons[0][0]
-        left = sequence[max(0, exon_start - 500):exon_start]
-        right = sequence[exon_start:exon_start + 50]
-        transition_seq = left + right # 500 + 50 = 550 characters
-        reduced_transition_seq = transition_seq[-105:] # 105 characters
+        left = sequence[max(0, exon_start - 100):exon_start]
+        right = sequence[exon_start:exon_start + 5]
+        reduced_transition_seq = left + right # 100 + 5 = 105 characters
+        # Insert ag to simulate the end of the intron
+        reduced_transition_seq = list(reduced_transition_seq)
+        reduced_transition_seq[99:101] = ["a", "g"]
+        reduced_transition_seq = "".join(reduced_transition_seq)
         self.ze_counter_example_data.append([gen_id, chromosome, global_start, None, *list(reduced_transition_seq)])
 
     def get_data(self):

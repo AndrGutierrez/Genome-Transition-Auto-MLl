@@ -40,10 +40,9 @@ class EZExtractor:
             # Check if there are enough characters and the intron starts with 'gt'
             if intron_start + 1 < len(sequence) and sequence[intron_start:intron_start + 2] == "gt":
                 # Extract 5 nucleotides to the left and 7 to the right
-                left = sequence[max(0, intron_start - 5):intron_start]
-                right = sequence[intron_start:intron_start + 7]
-                transition_seq = left + right  # 12 characters
-                expanded_transition_seq = (transition_seq * 46)[:550]  # 550 characters
+                left = sequence[max(0, intron_start - 50):intron_start]
+                right = sequence[intron_start:intron_start + 500]
+                expanded_transition_seq = left + right # 500 + 50 = 550 characters
                 self.ei_counter_example_data.append(
                     [gen_id, chromosome, global_start, exon_end, *list(expanded_transition_seq)])
 
@@ -54,17 +53,16 @@ class EZExtractor:
 
             # Check if there are enough characters and the intron ends with 'ag'
             if intron_end - 1 >= 0 and sequence[intron_end - 1:intron_end + 1] == "ag":
-                left = sequence[max(0, intron_end - 100):intron_end]
-                right = sequence[intron_end:intron_end + 5]
-                transition_seq = left + right  # 100 + 5 = 105 characters
-                expanded_transition_seq = (transition_seq * 6)[:550] # 550 characters
+                left = sequence[max(0, intron_end - 50):intron_end]
+                right = sequence[intron_end:intron_end + 500]
+                expanded_transition_seq = left + right # 500 + 50 = 550 characters
                 self.ie_counter_example_data.append(
                     [gen_id, chromosome, global_start, None, *list(expanded_transition_seq)])
 
     def extract_ze_counter_example(self, gen_id, chromosome, global_start, sequence, exons):
         exon_start = exons[0][0]
-        left = sequence[max(0, exon_start - 500):exon_start]
-        right = sequence[exon_start:exon_start + 50]
+        left = sequence[max(0, exon_start - 50):exon_start]
+        right = sequence[exon_start:exon_start + 500]
         transition_seq = left + right  # 500 + 50 = 550 characters
         self.ze_counter_example_data.append([gen_id, chromosome, global_start, None, *list(transition_seq)])
 
