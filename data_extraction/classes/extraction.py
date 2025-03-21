@@ -162,7 +162,6 @@ class Extraction:
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)]
         )
         self.__generate_combined_sample_dataset([
-            ei_true,
             ei_ie_counter_example,
             ei_ez_counter_example,
             ei_ze_counter_example,
@@ -203,7 +202,6 @@ class Extraction:
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)]
         )
         self.__generate_combined_sample_dataset([
-            ie_true,
             ie_ei_counter_example,
             ie_ez_counter_example,
             ie_ze_counter_example,
@@ -244,7 +242,6 @@ class Extraction:
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)]
         )
         self.__generate_combined_sample_dataset([
-            ze_true,
             ze_ei_counter_example,
             ze_ie_counter_example,
             ze_ez_counter_example,
@@ -285,7 +282,6 @@ class Extraction:
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)]
         )
         self.__generate_combined_sample_dataset([
-            ez_true,
             ez_ei_counter_example,
             ez_ie_counter_example,
             ez_ze_counter_example,
