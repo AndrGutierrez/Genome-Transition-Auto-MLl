@@ -143,23 +143,23 @@ class Extraction:
         )  = self.ei_extractor.get_data()
         ei_true.to_csv(
             f"{self.output_path}/ei/data_ei.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(12)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
         ei_ie_counter_example.to_csv(
             f"{self.output_path}/ei/data_ie_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(12)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
         ei_ez_counter_example.to_csv(
             f"{self.output_path}/ei/data_ez_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(12)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
         ei_ze_counter_example.to_csv(
             f"{self.output_path}/ei/data_ze_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(12)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
         ei_negative.to_csv(
             f"{self.output_path}/ei/data_ei_random.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(12)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
         self.__generate_combined_sample_dataset([
             ei_ie_counter_example,
@@ -168,7 +168,7 @@ class Extraction:
             ei_negative
         ]).to_csv(
             f"{self.output_path}/ei/data_sample_combined.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(12)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
 
         # IE
@@ -183,23 +183,23 @@ class Extraction:
         ) = self.ie_extractor.get_data()
         ie_true.to_csv(
             f"{self.output_path}/ie/data_ie.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(105)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
         )
         ie_ei_counter_example.to_csv(
             f"{self.output_path}/ie/data_ei_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(105)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
         )
         ie_ez_counter_example.to_csv(
             f"{self.output_path}/ie/data_ez_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(105)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
         )
         ie_ze_counter_example.to_csv(
             f"{self.output_path}/ie/data_ze_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(105)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
         )
         ie_negative.to_csv(
             f"{self.output_path}/ie/data_ie_random.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(105)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
         )
         self.__generate_combined_sample_dataset([
             ie_ei_counter_example,
@@ -208,7 +208,7 @@ class Extraction:
             ie_negative
         ]).to_csv(
             f"{self.output_path}/ie/data_sample_combined.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(105)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
         )
 
         # ZE
@@ -223,23 +223,23 @@ class Extraction:
         ) = self.ze_extractor.get_data()
         ze_true.to_csv(
             f"{self.output_path}/ze/data_ze.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         ze_ei_counter_example.to_csv(
             f"{self.output_path}/ze/data_ei_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         ze_ie_counter_example.to_csv(
             f"{self.output_path}/ze/data_ie_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         ze_ez_counter_example.to_csv(
             f"{self.output_path}/ze/data_ez_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         ze_negative.to_csv(
             f"{self.output_path}/ze/data_ze_random.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         self.__generate_combined_sample_dataset([
             ze_ei_counter_example,
@@ -248,7 +248,7 @@ class Extraction:
             ze_negative
         ]).to_csv(
             f"{self.output_path}/ze/data_sample_combined.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
 
         # EZ
@@ -263,23 +263,23 @@ class Extraction:
         ) = self.ez_extractor.get_data()
         ez_true.to_csv(
             f"{self.output_path}/ez/data_ez.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         ez_ei_counter_example.to_csv(
             f"{self.output_path}/ez/data_ei_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         ez_ie_counter_example.to_csv(
             f"{self.output_path}/ez/data_ie_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         ez_ze_counter_example.to_csv(
             f"{self.output_path}/ez/data_ze_counter_example.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         ez_negative.to_csv(
             f"{self.output_path}/ez/data_ez_random.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
         self.__generate_combined_sample_dataset([
             ez_ei_counter_example,
@@ -288,7 +288,7 @@ class Extraction:
             ez_negative
         ]).to_csv(
             f"{self.output_path}/ez/data_sample_combined.csv", index=False,
-            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End", "label"] + [f"B{i + 1}" for i in range(550)]
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(550)] + ["label"]
         )
 
     def __generate_combined_sample_dataset(self, list_of_datasets) -> pd.DataFrame:
