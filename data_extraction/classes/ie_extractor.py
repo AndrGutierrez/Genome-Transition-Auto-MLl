@@ -18,6 +18,7 @@ class IEExtractor:
     def __init__(self):
         self.true_data = []
         self.ei_counter_example_data = []  # Stores EI transitions expanded to 105 characters
+        self.ei_true_counter_example = []  # Stores EI transitions expanded to 105 characters
         self.ez_counter_example_data = []  # Stores EZ transitions reduced to 105 characters
         self.ze_counter_example_data = []  # Stores ZE transitions reduced to 105 characters
         self.false_data = []
@@ -55,6 +56,21 @@ class IEExtractor:
                 expanded_transition_seq = "".join(expanded_transition_seq)
                 self.ei_counter_example_data.append([gen_id, chromosome, global_start, exon_end, *list(expanded_transition_seq)])
 
+    def extract_ei_true_counter_example(self, gen_id, chromosome, global_start, sequence, exons):
+        for i in range(len(exons) - 1):
+            exon_end = exons[i][1]
+            intron_start = exon_end + 1
+
+            # Check if there are enough characters and the intron starts with 'gt'
+            if intron_start + 1 < len(sequence) and sequence[intron_start:intron_start + 2] == "gt":
+                left = sequence[max(0, intron_start - 100):intron_start]
+                right = sequence[intron_start:intron_start + 5]
+                expanded_transition_seq = left + right #  100 + 5 = 105 characters
+                # Insert ag to simulate the end of the intron
+                expanded_transition_seq = list(expanded_transition_seq)
+                expanded_transition_seq = "".join(expanded_transition_seq)
+                self.ei_true_counter_example.append([gen_id, chromosome, global_start, exon_end, *list(expanded_transition_seq)])
+
     def extract_ez_counter_example(self, gen_id, chromosome, global_start, sequence, exons):
         exon_end = exons[-1][1]
         left = sequence[max(0, exon_end - 100):exon_end]
@@ -80,12 +96,14 @@ class IEExtractor:
     def get_data(self):
         true_data_df = pd.DataFrame(self.true_data)
         ei_counter_example_data_df = pd.DataFrame(self.ei_counter_example_data)
+        ei_true_counter_example_data_df = pd.DataFrame(self.ei_true_counter_example)
         ez_counter_example_data_df = pd.DataFrame(self.ez_counter_example_data)
         ze_counter_example_data_df = pd.DataFrame(self.ze_counter_example_data)
         false_data_df = pd.DataFrame(self.false_data)
 
         true_data_df["label"] = True
         ei_counter_example_data_df["label"] = False
+        ei_true_counter_example_data_df["label"] = False
         ez_counter_example_data_df["label"] = False
         ze_counter_example_data_df["label"] = False
         false_data_df["label"] = False
@@ -93,6 +111,7 @@ class IEExtractor:
         return (
             true_data_df,
             ei_counter_example_data_df,
+            ei_true_counter_example_data_df,
             ez_counter_example_data_df,
             ze_counter_example_data_df,
             false_data_df

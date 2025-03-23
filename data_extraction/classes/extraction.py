@@ -71,6 +71,7 @@ class Extraction:
                         # EI extraction: extract true transitions and generate false examples.
                         self.ei_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
                         self.ei_extractor.extract_ie_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ei_extractor.extract_ie_true_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ei_extractor.extract_ez_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ei_extractor.extract_ze_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ei_extractor.extract_false_random(gen_id, chromosome, global_start)
@@ -78,6 +79,7 @@ class Extraction:
                         # IE extraction
                         self.ie_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
                         self.ie_extractor.extract_ei_counter_example(gen_id, chromosome, global_start, sequence, exons)
+                        self.ie_extractor.extract_ei_true_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ie_extractor.extract_ez_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ie_extractor.extract_ze_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ie_extractor.extract_false_random(gen_id, chromosome, global_start)
@@ -137,6 +139,7 @@ class Extraction:
         (
             ei_true,
             ei_ie_counter_example,
+            ei_ie_true_counter_example,
             ei_ez_counter_example,
             ei_ze_counter_example,
             ei_negative
@@ -147,6 +150,10 @@ class Extraction:
         )
         ei_ie_counter_example.to_csv(
             f"{self.output_path}/ei/data_ie_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
+        )
+        ei_ie_true_counter_example.to_csv(
+            f"{self.output_path}/ei/data_ie_true_counter_example.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
         ei_ez_counter_example.to_csv(
@@ -163,6 +170,7 @@ class Extraction:
         )
         self.__generate_combined_sample_dataset([
             ei_ie_counter_example,
+            ei_ie_true_counter_example,
             ei_ez_counter_example,
             ei_ze_counter_example,
             ei_negative
@@ -177,6 +185,7 @@ class Extraction:
         (
             ie_true,
             ie_ei_counter_example,
+            ie_ei_true_counter_example,
             ie_ez_counter_example,
             ie_ze_counter_example,
             ie_negative
@@ -187,6 +196,10 @@ class Extraction:
         )
         ie_ei_counter_example.to_csv(
             f"{self.output_path}/ie/data_ei_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
+        )
+        ie_ei_true_counter_example.to_csv(
+            f"{self.output_path}/ie/data_ei_true_counter_example.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
         )
         ie_ez_counter_example.to_csv(
@@ -203,6 +216,7 @@ class Extraction:
         )
         self.__generate_combined_sample_dataset([
             ie_ei_counter_example,
+            ie_ei_true_counter_example,
             ie_ez_counter_example,
             ie_ze_counter_example,
             ie_negative
