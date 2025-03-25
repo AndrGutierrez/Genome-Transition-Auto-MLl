@@ -20,13 +20,18 @@ class Extraction:
            - Generate false (negative) examples.
       4. Stores all extracted data for later saving.
     """
-    def __init__(self, file_path, output_path="../data"):
-        self.file_path = file_path
+    def __init__(self, file_paths, output_path="../data"):
+        # Accept a single file path or list of file paths.
+        if isinstance(file_paths, str):
+            file_paths = [file_paths]
+        self.file_paths = file_paths
         self.output_path = output_path
 
-        # Read file contents
-        with open(self.file_path, "r") as f:
-            self.lines = f.readlines()
+        # Accumulate all lines from all provided files.
+        self.lines = []
+        for path in self.file_paths:
+            with open(path, "r") as f:
+                self.lines.extend(f.readlines())
 
         # Regex pattern to identify transcript lines
         self.transcript_regex = re.compile(r"^\(\[(\d+,\d+)](,\[(\d+,\d+)])*,\[(\d+)]\)$")
