@@ -67,10 +67,22 @@ class EZExtractor:
         self.ze_counter_example_data.append([gen_id, chromosome, global_start, None, *list(transition_seq)])
 
     def get_data(self):
+        true_data_df = pd.DataFrame(self.true_data)
+        ei_counter_example_data_df = pd.DataFrame(self.ei_counter_example_data)
+        ie_counter_example_data_df = pd.DataFrame(self.ie_counter_example_data)
+        ze_counter_example_data_df = pd.DataFrame(self.ze_counter_example_data)
+        false_data_df = pd.DataFrame(self.false_data)
+
+        true_data_df["label"] = True
+        ei_counter_example_data_df["label"] = False
+        ie_counter_example_data_df["label"] = False
+        ze_counter_example_data_df["label"] = False
+        false_data_df["label"] = False
+
         return (
-            pd.DataFrame(self.true_data),
-            pd.DataFrame(self.ei_counter_example_data),
-            pd.DataFrame(self.ie_counter_example_data),
-            pd.DataFrame(self.ze_counter_example_data),
-            pd.DataFrame(self.false_data)
+            true_data_df,
+            ei_counter_example_data_df,
+            ie_counter_example_data_df,
+            ze_counter_example_data_df,
+            false_data_df
         )
