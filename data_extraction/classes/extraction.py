@@ -55,12 +55,12 @@ class Extraction:
             if line.startswith("("):
                 # Extract gene information using regex
                 match = re.match(
-                    r"\(\[(.*?)],\[(\d+)],\[(\d+)],\[(.*?)],\[(\d+)],\[(\d+)],\[(\d+)],(true|false)\)",
+                    r"\(\[(.*?)],\[(\d+)],\[(\d+)],\[(.*?)],\[(\d+|\w+)],\[(\d+)],\[(\d+)],(true|false)\)",
                     line
                 )
                 if match:
                     gen_id, start, end, sequence, chromosome, global_start, global_end, strand = match.groups()
-                    start, end, chromosome, global_start, global_end = map(int, [start, end, chromosome, global_start, global_end])
+                    start, end, global_start, global_end = map(int, [start, end, global_start, global_end])
 
                     # Accumulate transcript lines (exon details)
                     exons_list = []
