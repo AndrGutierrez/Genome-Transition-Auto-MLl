@@ -80,6 +80,7 @@ class Extraction:
                         self.ei_extractor.extract_ez_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ei_extractor.extract_ze_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ei_extractor.extract_false_random(gen_id, chromosome, global_start)
+                        self.ei_extractor.extract_test_false(gen_id, chromosome, global_start, sequence, exons)
 
                         # IE extraction
                         self.ie_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
@@ -147,7 +148,8 @@ class Extraction:
             ei_ie_true_counter_example,
             ei_ez_counter_example,
             ei_ze_counter_example,
-            ei_negative
+            ei_negative,
+            ei_test_false
         )  = self.ei_extractor.get_data()
         ei_true.to_csv(
             f"{self.output_path}/ei/data_ei.csv", index=False,
@@ -181,6 +183,10 @@ class Extraction:
             ei_negative
         ]).to_csv(
             f"{self.output_path}/ei/data_sample_combined.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
+        )
+        ei_test_false.to_csv(
+            f"{self.output_path}/ei/data_test_false.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
 

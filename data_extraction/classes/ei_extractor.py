@@ -23,6 +23,8 @@ class EIExtractor:
         self.ze_counter_example_data = [] # Stores ZE transitions reduced to 12 characters
         self.false_data = []  # Stores false EI transitions
 
+        self.test_false_data = [] # Stores false EI, which are all from protein-coding genes
+
     def extract_true(self, gen_id, chromosome, global_start, sequence, exons):
         for i in range(len(exons) - 1):
             exon_end = exons[i][1]
@@ -35,6 +37,19 @@ class EIExtractor:
                 right = sequence[intron_start:intron_start + 7]
                 transition_seq = left + right
                 self.true_data.append([gen_id, chromosome, global_start, exon_end, *list(transition_seq)])
+
+    def extract_test_false(self, gen_id, chromosome, global_start, sequence, exons):
+        for i in range(len(exons) - 1):
+            exon_end = exons[i][1]
+            intron_start = exon_end + 1
+
+            # Check if there are enough characters and the intron starts with 'gt'
+            if not (intron_start + 1 < len(sequence) and sequence[intron_start:intron_start + 2] == "gt"):
+                # Extract 5 nucleotides to the left and 7 to the right
+                left = sequence[max(0, intron_start - 5):intron_start]
+                right = sequence[intron_start:intron_start + 7]
+                transition_seq = left + right
+                self.test_false_data.append([gen_id, chromosome, global_start, exon_end, *list(transition_seq)])
 
     def extract_false_random(self, gen_id, chromosome, global_start):
         # Generate a false EI transition: random 12-character string
@@ -102,6 +117,7 @@ class EIExtractor:
         ez_counter_example_data_df = pd.DataFrame(self.ez_counter_example_data)
         ze_counter_example_data_df = pd.DataFrame(self.ze_counter_example_data)
         false_data_df = pd.DataFrame(self.false_data)
+        test_false_data_df = pd.DataFrame(self.test_false_data)
 
         true_data_df["label"] = True
         ie_counter_example_data_df["label"] = False
@@ -109,6 +125,7 @@ class EIExtractor:
         ez_counter_example_data_df["label"] = False
         ze_counter_example_data_df["label"] = False
         false_data_df["label"] = False
+        test_false_data_df["label"] = False
 
         return (
             true_data_df,
@@ -116,5 +133,6 @@ class EIExtractor:
             ie_true_counter_example_data_df,
             ez_counter_example_data_df,
             ze_counter_example_data_df,
-            false_data_df
+            false_data_df,
+            test_false_data_df
         )
