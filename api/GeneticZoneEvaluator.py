@@ -17,6 +17,7 @@ class GeneticZoneEvaluator:
                 paths = [paths]
             self.predictor[zone] = [TabularPredictor.load(path, require_py_version_match=False) for path in paths]
 
+
     def _predict(self, zone, window_str):
         """
         Predicts the label for a given window_str using all predictors for the specified zone.
@@ -30,7 +31,7 @@ class GeneticZoneEvaluator:
         data = {f"B{i+1}": [char] for i, char in enumerate(window_str)}
         df = pd.DataFrame(data)
         for predictor in self.predictor[zone]:
-            pred = predictor.predict(df)[0]
+            pred = predictor.predict(df, decision_threshold=0.98)[0]
             if isinstance(pred, str):
                 pred_bool = (pred.lower() == "true")
             else:
