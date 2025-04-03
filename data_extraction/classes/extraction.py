@@ -199,7 +199,8 @@ class Extraction:
             ie_ei_true_counter_example,
             ie_ez_counter_example,
             ie_ze_counter_example,
-            ie_negative
+            ie_negative,
+            ie_test_false
         ) = self.ie_extractor.get_data()
         ie_true.to_csv(
             f"{self.output_path}/ie/data_ie.csv", index=False,
@@ -233,6 +234,10 @@ class Extraction:
             ie_negative
         ]).to_csv(
             f"{self.output_path}/ie/data_sample_combined.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
+        )
+        ie_test_false.to_csv(
+            f"{self.output_path}/ie/data_test_false.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
         )
 
