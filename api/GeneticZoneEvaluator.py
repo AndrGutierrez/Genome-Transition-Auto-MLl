@@ -17,28 +17,43 @@ class GeneticZoneEvaluator:
                 paths = [paths]
             self.predictor[zone] = [TabularPredictor.load(path, require_py_version_match=False) for path in paths]
 
-
-    def _predict(self, zone, window_str):
+    def _predict(self, zone, window_strings):
         """
-        Predicts the label for a given window_str using all predictors for the specified zone.
-        Instead of passing a single "sequence" column, this method transforms the window_str into
+        Predicts the labels for multiple window strings using all predictors for the specified zone.
+        Instead of passing a single "sequence" column, this method transforms each window_str into
         individual columns: B1, B2, ..., B{n}, where n = len(window_str).
-        Returns True if the majority of predictors classify the window as positive.
+        Returns a list of booleans indicating if the majority of predictors classified each window as positive.
+        
+        :param window_strings: List of window strings to predict
+        :return: List of boolean predictions
         """
-        votes = 0
-        total = len(self.predictor[zone])
-        # Transform window_str into a DataFrame with each character in separate columns.
-        data = {f"B{i+1}": [char] for i, char in enumerate(window_str)}
+        if not window_strings:
+            return []
+            
+        # Transform all window strings into a DataFrame with each character in separate columns
+        data = {}
+        for i in range(len(window_strings[0])):
+            data[f"B{i+1}"] = [window[i] for window in window_strings]
         df = pd.DataFrame(data)
+        
+        # Get predictions from all models
+        all_predictions = []
         for predictor in self.predictor[zone]:
-            pred = predictor.predict(df, decision_threshold=0.98)[0]
-            if isinstance(pred, str):
-                pred_bool = (pred.lower() == "true")
+            preds = predictor.predict(df, decision_threshold=0.98)
+            if isinstance(preds[0], str):
+                preds = [p.lower() == "true" for p in preds]
             else:
-                pred_bool = bool(pred)
-            if pred_bool:
-                votes += 1
-        return votes > total / 2
+                preds = [bool(p) for p in preds]
+            all_predictions.append(preds)
+        
+        # Calculate majority vote for each window
+        total = len(self.predictor[zone])
+        final_predictions = []
+        for i in range(len(window_strings)):
+            votes = sum(1 for preds in all_predictions if preds[i])
+            final_predictions.append(votes > total / 2)
+            
+        return final_predictions
 
     def _evaluate_ei(self, nucleotide_string):
         """
@@ -49,6 +64,7 @@ class GeneticZoneEvaluator:
         If the majority vote is positive, record the starting index.
         """
         positions = []
+        windows = []
         start_index = 0
         while True:
             pos = nucleotide_string.find("gt", start_index)
@@ -56,10 +72,14 @@ class GeneticZoneEvaluator:
                 break
             if pos - 5 >= 0 and pos + 7 <= len(nucleotide_string):
                 window = nucleotide_string[pos - 5 : pos + 7]  # Length = 12
-                if self._predict("ei", window):
-                    positions.append(pos)
+                windows.append(window)
+                positions.append(pos)
             start_index = pos + 1
-        return positions
+            
+        if windows:
+            predictions = self._predict("ei", windows)
+            return [pos for pos, pred in zip(positions, predictions) if pred]
+        return []
 
     def _evaluate_ie(self, nucleotide_string):
         """
@@ -70,6 +90,7 @@ class GeneticZoneEvaluator:
         If the majority vote is positive, record the starting index.
         """
         positions = []
+        windows = []
         start_index = 0
         while True:
             pos = nucleotide_string.find("ag", start_index)
@@ -78,10 +99,14 @@ class GeneticZoneEvaluator:
             intron_end = pos + 1
             if intron_end - 100 >= 0 and intron_end + 5 <= len(nucleotide_string):
                 window = nucleotide_string[intron_end - 100 : intron_end + 5]  # Length = 105
-                if self._predict("ie", window):
-                    positions.append(pos)
+                windows.append(window)
+                positions.append(pos)
             start_index = pos + 1
-        return positions
+            
+        if windows:
+            predictions = self._predict("ie", windows)
+            return [pos for pos, pred in zip(positions, predictions) if pred]
+        return []
 
     def _evaluate_ze(self, nucleotide_string):
         """
@@ -91,12 +116,17 @@ class GeneticZoneEvaluator:
         If the majority vote is positive, record the starting index.
         """
         positions = []
+        windows = []
         window_size = 550
         for i in range(len(nucleotide_string) - window_size + 1):
             window = nucleotide_string[i : i + window_size]
-            if self._predict("ze", window):
-                positions.append(i)
-        return positions
+            windows.append(window)
+            positions.append(i)
+            
+        if windows:
+            predictions = self._predict("ze", windows)
+            return [pos for pos, pred in zip(positions, predictions) if pred]
+        return []
 
     def _evaluate_ez(self, nucleotide_string):
         """
@@ -106,12 +136,17 @@ class GeneticZoneEvaluator:
         If the majority vote is positive, record the starting index.
         """
         positions = []
+        windows = []
         window_size = 550
         for i in range(len(nucleotide_string) - window_size + 1):
             window = nucleotide_string[i : i + window_size]
-            if self._predict("ez", window):
-                positions.append(i)
-        return positions
+            windows.append(window)
+            positions.append(i)
+            
+        if windows:
+            predictions = self._predict("ez", windows)
+            return [pos for pos, pred in zip(positions, predictions) if pred]
+        return []
 
     def evaluate(self, nucleotide_string):
         """
