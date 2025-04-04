@@ -89,6 +89,7 @@ class Extraction:
                         self.ie_extractor.extract_ez_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ie_extractor.extract_ze_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ie_extractor.extract_false_random(gen_id, chromosome, global_start)
+                        self.ie_extractor.extract_test_false(gen_id, chromosome, global_start, sequence, exons)
 
                         # ZE extraction
                         self.ze_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
