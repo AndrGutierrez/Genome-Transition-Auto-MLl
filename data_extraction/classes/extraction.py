@@ -20,13 +20,18 @@ class Extraction:
            - Generate false (negative) examples.
       4. Stores all extracted data for later saving.
     """
-    def __init__(self, file_path, output_path="../data"):
-        self.file_path = file_path
+    def __init__(self, file_paths, output_path="../data"):
+        # Accept a single file path or list of file paths.
+        if isinstance(file_paths, str):
+            file_paths = [file_paths]
+        self.file_paths = file_paths
         self.output_path = output_path
 
-        # Read file contents
-        with open(self.file_path, "r") as f:
-            self.lines = f.readlines()
+        # Accumulate all lines from all provided files.
+        self.lines = []
+        for path in self.file_paths:
+            with open(path, "r") as f:
+                self.lines.extend(f.readlines())
 
         # Regex pattern to identify transcript lines
         self.transcript_regex = re.compile(r"^\(\[(\d+,\d+)](,\[(\d+,\d+)])*,\[(\d+)]\)$")
@@ -50,12 +55,12 @@ class Extraction:
             if line.startswith("("):
                 # Extract gene information using regex
                 match = re.match(
-                    r"\(\[(.*?)],\[(\d+)],\[(\d+)],\[(.*?)],\[(\d+)],\[(\d+)],\[(\d+)],(true|false)\)",
+                    r"\(\[(.*?)],\[(\d+)],\[(\d+)],\[(.*?)],\[(\d+|\w+)],\[(\d+)],\[(\d+)],(true|false)\)",
                     line
                 )
                 if match:
                     gen_id, start, end, sequence, chromosome, global_start, global_end, strand = match.groups()
-                    start, end, chromosome, global_start, global_end = map(int, [start, end, chromosome, global_start, global_end])
+                    start, end, global_start, global_end = map(int, [start, end, global_start, global_end])
 
                     # Accumulate transcript lines (exon details)
                     exons_list = []
@@ -75,6 +80,7 @@ class Extraction:
                         self.ei_extractor.extract_ez_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ei_extractor.extract_ze_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ei_extractor.extract_false_random(gen_id, chromosome, global_start)
+                        self.ei_extractor.extract_test_false(gen_id, chromosome, global_start, sequence, exons)
 
                         # IE extraction
                         self.ie_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
@@ -83,6 +89,7 @@ class Extraction:
                         self.ie_extractor.extract_ez_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ie_extractor.extract_ze_counter_example(gen_id, chromosome, global_start, sequence, exons)
                         self.ie_extractor.extract_false_random(gen_id, chromosome, global_start)
+                        self.ie_extractor.extract_test_false(gen_id, chromosome, global_start, sequence, exons)
 
                         # ZE extraction
                         self.ze_extractor.extract_true(gen_id, chromosome, global_start, sequence, exons)
@@ -142,7 +149,8 @@ class Extraction:
             ei_ie_true_counter_example,
             ei_ez_counter_example,
             ei_ze_counter_example,
-            ei_negative
+            ei_negative,
+            ei_test_false
         )  = self.ei_extractor.get_data()
         ei_true.to_csv(
             f"{self.output_path}/ei/data_ei.csv", index=False,
@@ -178,6 +186,10 @@ class Extraction:
             f"{self.output_path}/ei/data_sample_combined.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
+        ei_test_false.to_csv(
+            f"{self.output_path}/ei/data_test_false.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
+        )
 
         # IE
         if not os.path.exists(self.output_path + '/ie'):
@@ -188,7 +200,8 @@ class Extraction:
             ie_ei_true_counter_example,
             ie_ez_counter_example,
             ie_ze_counter_example,
-            ie_negative
+            ie_negative,
+            ie_test_false
         ) = self.ie_extractor.get_data()
         ie_true.to_csv(
             f"{self.output_path}/ie/data_ie.csv", index=False,
@@ -222,6 +235,10 @@ class Extraction:
             ie_negative
         ]).to_csv(
             f"{self.output_path}/ie/data_sample_combined.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
+        )
+        ie_test_false.to_csv(
+            f"{self.output_path}/ie/data_test_false.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + ["label"]
         )
 
