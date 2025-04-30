@@ -131,6 +131,32 @@ def load_and_evaluate_data(model_paths, data_paths, output_path=None):
             "negative_cases": evaluate_dataframe(models["ez"], ez_negative_cases, "ez")
         }
     
+    # Evaluate EZ-ZE zone
+    if "ze-ez" in models:
+        (
+            ze_true,
+            ei_counter_example_data_df,
+            ie_counter_example_data_df,
+            ez_counter_example_data_df,
+            false_data_df
+        ) = extractor.ze_extractor.get_data()
+
+        (
+            ez_true,
+            ei_counter_example_data_df,
+            ie_counter_example_data_df,
+            ez_counter_example_data_df,
+            false_data_df
+        ) = extractor.ez_extractor.get_data()
+
+        ze_true["label"] = "ze"
+        ez_true["label"] = "ez"
+
+        results["ze-ez"] = {
+            "ze_cases": evaluate_dataframe(models["ze-ez"], ze_true, "ze-ez"),
+            "ez_cases": evaluate_dataframe(models["ze-ez"], ez_true, "ze-ez")
+        }
+    
     return results
 
 def evaluate_dataframe(model, df, zone):
@@ -140,7 +166,7 @@ def evaluate_dataframe(model, df, zone):
     Args:
         model (TabularPredictor): AutoGluon model for the zone
         df (pd.DataFrame): DataFrame with data to evaluate
-        zone (str): Zone to evaluate ('ei', 'ie', 'ze', 'ez')
+        zone (str): Zone to evaluate ('ei', 'ie', 'ze', 'ez', 'ze-ez')
     
     Returns:
         dict: Evaluation results
@@ -155,7 +181,7 @@ def evaluate_dataframe(model, df, zone):
     elif zone == "ie":
         num_nucleotides = 105
         start_col = 4  # First 4 columns are metadata
-    elif zone in ["ze", "ez"]:
+    elif zone in ["ze", "ez", "ze-ez"]:
         num_nucleotides = 550
         start_col = 4  # First 4 columns are metadata
     else:
@@ -170,13 +196,16 @@ def evaluate_dataframe(model, df, zone):
     
     # Get true labels
     labels = df['label'].tolist()
-    
+
     # Get model predictions
     preds = model.predict(nucleotide_df, decision_threshold=0.5)
     predictions = [p.lower() == "true" for p in preds]
     
     # Compare predictions with labels
-    correct = sum(1 for pred, real_value in zip(predictions, labels) if pred == real_value)
+    if zone == "ze-ez":
+        correct = sum(1 for pred, real_value in zip(preds, labels) if pred.lower() == real_value.lower())
+    else:
+        correct = sum(1 for pred, real_value in zip(predictions, labels) if pred == real_value)
     incorrect = len(df) - correct
     accuracy = correct / len(df) if len(df) > 0 else 0.0
     
@@ -250,8 +279,8 @@ def print_results(results, output_dir="results"):
         plt.figure(figsize=(6, 6))
         
         # Calculate confusion matrix values
-        positive_results = zone_results['positive_cases']
-        negative_results = zone_results['negative_cases']
+        positive_results = zone_results.get('positive_cases', zone_results.get('ze_cases'))
+        negative_results = zone_results.get('negative_cases', zone_results.get('ez_cases'))
         
         true_positive = positive_results['correct']
         false_positive = negative_results['incorrect']
@@ -293,6 +322,7 @@ if __name__ == "__main__":
         "ie": "../models/ie/combined",
         "ez": "../models/ez/combined",
         "ze": "../models/ze/combined",
+        "ze-ez": "../models/ze-ez/ZE-EZ"
     }
     
     data_paths = [
