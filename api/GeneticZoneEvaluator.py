@@ -39,7 +39,7 @@ class GeneticZoneEvaluator:
         # Get predictions from all models
         all_predictions = []
         for predictor in self.predictor[zone]:
-            preds = predictor.predict(df, decision_threshold=0.98)
+            preds = predictor.predict(df, decision_threshold=0.85)
             if isinstance(preds[0], str):
                 preds = [p.lower() == "true" for p in preds]
             else:
