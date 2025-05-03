@@ -157,6 +157,36 @@ def load_and_evaluate_data(model_paths, data_paths, output_path=None):
             "ez_cases": evaluate_dataframe(models["ze-ez"], ez_true, "ze-ez")
         }
     
+    # Evaluate EI-IE zone
+    if "ei-ie" in models:
+        (
+            ei_true,
+            ie_counter_example_data_df,
+            ie_true_counter_example_data_df,
+            ez_counter_example_data_df,
+            ze_counter_example_data_df,
+            false_data_df,
+            test_false_data_df
+        ) = extractor.ei_extractor.get_data()
+
+        (
+            ie_true,
+            ei_counter_example_data_df,
+            ei_true_counter_example_data_df,
+            ez_counter_example_data_df,
+            ze_counter_example_data_df,
+            false_data_df,
+            test_false_data_df
+        ) = extractor.ie_extractor.get_data()
+
+        ei_true["label"] = "ei"
+        ie_true["label"] = "ie"
+
+        results["ei-ie"] = {
+            "ei_cases": evaluate_dataframe(models["ei-ie"], ei_true, "ei-ie"),
+            "ie_cases": evaluate_dataframe(models["ei-ie"], ie_true, "ei-ie")
+        }
+    
     return results
 
 def evaluate_dataframe(model, df, zone):
@@ -175,10 +205,10 @@ def evaluate_dataframe(model, df, zone):
         return {"total": 0, "correct": 0, "incorrect": 0, "accuracy": 0.0}
     
     # Determine number of nucleotide columns based on zone
-    if zone == "ei":
+    if zone in ["ei", "ei-ie"]:
         num_nucleotides = 12
         start_col = 4  # First 4 columns are metadata
-    elif zone == "ie":
+    elif zone in ["ie"]:
         num_nucleotides = 105
         start_col = 4  # First 4 columns are metadata
     elif zone in ["ze", "ez", "ze-ez"]:
@@ -202,7 +232,7 @@ def evaluate_dataframe(model, df, zone):
     predictions = [p.lower() == "true" for p in preds]
     
     # Compare predictions with labels
-    if zone == "ze-ez":
+    if zone in ["ze-ez", "ei-ie"]:
         correct = sum(1 for pred, real_value in zip(preds, labels) if pred.lower() == real_value.lower())
     else:
         correct = sum(1 for pred, real_value in zip(predictions, labels) if pred == real_value)
@@ -279,9 +309,9 @@ def print_results(results, output_dir="results"):
         plt.figure(figsize=(6, 6))
         
         # Calculate confusion matrix values
-        positive_results = zone_results.get('positive_cases', zone_results.get('ze_cases'))
-        negative_results = zone_results.get('negative_cases', zone_results.get('ez_cases'))
-        
+        positive_results = zone_results.get('positive_cases') or zone_results.get('ze_cases') or zone_results.get('ei_cases')
+        negative_results = zone_results.get('negative_cases') or zone_results.get('ez_cases') or zone_results.get('ie_cases')
+
         true_positive = positive_results['correct']
         false_positive = negative_results['incorrect']
         false_negative = positive_results['incorrect']
@@ -318,11 +348,12 @@ def print_results(results, output_dir="results"):
 if __name__ == "__main__":
     
     model_paths = {
-        "ei": "../models/ei/combined",
-        "ie": "../models/ie/combined",
-        "ez": "../models/ez/combined",
-        "ze": "../models/ze/combined",
-        "ze-ez": "../models/ze-ez/ZE-EZ"
+        # "ei": "../models/ei/combined",
+        # "ie": "../models/ie/combined",
+        # "ez": "../models/ez/combined",
+        # "ze": "../models/ze/combined",
+        # "ze-ez": "../models/ze-ez/ZE-EZ"
+        'ei-ie': "../models/ei-ie/EI-IE",
     }
     
     data_paths = [
