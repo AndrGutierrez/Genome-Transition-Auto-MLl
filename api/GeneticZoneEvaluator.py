@@ -67,8 +67,6 @@ class GeneticZoneEvaluator:
             
         if windows:
             predictions = self._predict("ei", windows)
-            print(predictions.shape)
-            print(len(positions))
             return [pos for pos, pred in zip(positions, predictions) if pred]
         return []
 
