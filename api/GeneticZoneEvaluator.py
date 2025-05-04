@@ -17,14 +17,17 @@ class GeneticZoneEvaluator:
                 paths = [paths]
             self.predictor[zone] = [TabularPredictor.load(path, require_py_version_match=False) for path in paths]
 
-    def _predict(self, zone, window_strings):
+    def _predict(self, zone, window_strings, method="top_n", max_predictions=10, threshold=0.5):
         """
         Predicts the labels for multiple window strings using all predictors for the specified zone.
         Instead of passing a single "sequence" column, this method transforms each window_str into
         individual columns: B1, B2, ..., B{n}, where n = len(window_str).
-        Returns a list of booleans indicating if the majority of predictors classified each window as positive.
+        Returns a list of booleans indicating if the predictions meet the criteria.
         
         :param window_strings: List of window strings to predict
+        :param method: Prediction method to use ('top_n' or 'percentage')
+        :param max_predictions: Number of top predictions to return when method is 'top_n'
+        :param threshold: Probability threshold when method is 'percentage'
         :return: List of boolean predictions
         """
         if not window_strings:
@@ -38,11 +41,18 @@ class GeneticZoneEvaluator:
         
         # Get predictions from all models
         preds = self.predictor[zone][0].predict_proba(df, as_pandas=True)
-        all_predictions = (preds["true"].rank(method="first", ascending=False) <= 10).to_list()
+        
+        if method == "top_n":
+            all_predictions = (
+                    (preds["true"].rank(method="first", ascending=False) <= max_predictions) &
+                    (preds["true"] >= threshold)
+            ).to_list()
+        else:  # percentage method
+            all_predictions = (preds["true"] >= threshold).to_list()
 
         return all_predictions
 
-    def _evaluate_ei(self, nucleotide_string):
+    def _evaluate_ei(self, nucleotide_string, method="top_n", max_predictions=10, threshold=0.5):
         """
         Evaluates the nucleotide string for EI zones.
         For each occurrence of "gt", extract a 12-character window (5 characters to the left,
@@ -64,11 +74,11 @@ class GeneticZoneEvaluator:
             start_index = pos + 1
             
         if windows:
-            predictions = self._predict("ei", windows)
+            predictions = self._predict("ei", windows, method, max_predictions, threshold)
             return [pos for pos, pred in zip(positions, predictions) if pred]
         return []
 
-    def _evaluate_ie(self, nucleotide_string):
+    def _evaluate_ie(self, nucleotide_string, method="top_n", max_predictions=10, threshold=0.5):
         """
         Evaluates the nucleotide string for IE zones.
         For each occurrence of "ag", define intron_end as (pos + 1),
@@ -91,11 +101,11 @@ class GeneticZoneEvaluator:
             start_index = pos + 1
 
         if windows:
-            predictions = self._predict("ie", windows)
+            predictions = self._predict("ie", windows, method, max_predictions, threshold)
             return [pos for pos, pred in zip(positions, predictions) if pred]
         return []
 
-    def _evaluate_ze(self, nucleotide_string):
+    def _evaluate_ze(self, nucleotide_string, method="top_n", max_predictions=10, threshold=0.5):
         """
         Evaluates the nucleotide string for ZE zones.
         A sliding window of 550 characters is moved one character at a time.
@@ -111,11 +121,11 @@ class GeneticZoneEvaluator:
             positions.append(i)
 
         if windows:
-            predictions = self._predict("ze", windows)
+            predictions = self._predict("ze", windows, method, max_predictions, threshold)
             return [pos for pos, pred in zip(positions, predictions) if pred]
         return []
 
-    def _evaluate_ez(self, nucleotide_string):
+    def _evaluate_ez(self, nucleotide_string, method="top_n", max_predictions=10, threshold=0.5):
         """
         Evaluates the nucleotide string for EZ zones.
         A sliding window of 550 characters is moved one character at a time.
@@ -131,23 +141,29 @@ class GeneticZoneEvaluator:
             positions.append(i)
 
         if windows:
-            predictions = self._predict("ez", windows)
+            predictions = self._predict("ez", windows, method, max_predictions, threshold)
             return [pos for pos, pred in zip(positions, predictions) if pred]
         return []
 
-    def evaluate(self, nucleotide_string):
+    def evaluate(self, nucleotide_string, method="top_n", max_predictions=10, threshold=0.5):
         """
         Public method to evaluate a nucleotide string for all available genetic zones.
         Returns a dictionary with keys corresponding to the zones present in the predictor dictionary,
         each mapping to a list of positions where the zone was detected.
+        
+        :param nucleotide_string: The sequence to evaluate
+        :param method: Prediction method to use ('top_n' or 'percentage')
+        :param max_predictions: Number of top predictions to return when method is 'top_n'
+        :param threshold: Probability threshold when method is 'percentage'
+        :return: Dictionary with zone predictions
         """
         results = {}
         if "ei" in self.predictor:
-            results["ei"] = self._evaluate_ei(nucleotide_string)
+            results["ei"] = self._evaluate_ei(nucleotide_string, method, max_predictions, threshold)
         if "ie" in self.predictor:
-            results["ie"] = self._evaluate_ie(nucleotide_string)
+            results["ie"] = self._evaluate_ie(nucleotide_string, method, max_predictions, threshold)
         if "ze" in self.predictor:
-            results["ze"] = self._evaluate_ze(nucleotide_string)
+            results["ze"] = self._evaluate_ze(nucleotide_string, method, max_predictions, threshold)
         if "ez" in self.predictor:
-            results["ez"] = self._evaluate_ez(nucleotide_string)
+            results["ez"] = self._evaluate_ez(nucleotide_string, method, max_predictions, threshold)
         return results

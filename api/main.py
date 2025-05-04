@@ -75,7 +75,7 @@ async def read_root():
 @app.post("/predict",
           response_model=PredictionResponse,
           summary="Predict Genetic Zones",
-          description="Accepts a nucleotide sequence and returns predicted start positions for EI, IE, ZE, and EZ zones.",
+          description="Accepts a nucleotide sequence and returns predicted start positions for EI, IE, ZE, and EZ zones. Supports two prediction methods: 'top_n' for top N predictions or 'percentage' for predictions above a probability threshold.",
           status_code=status.HTTP_200_OK)
 async def predict_zones(request: PredictionRequest):
     """
@@ -93,7 +93,7 @@ async def predict_zones(request: PredictionRequest):
             detail="Models are not loaded or failed to load. Please check server logs."
         )
 
-    logger.info(f"Received prediction request for sequence of length {len(request.sequence)}.")
+    logger.info(f"Received prediction request for sequence of length {len(request.sequence)} with method {request.method}.")
 
     try:
         # Get the current asyncio event loop
@@ -103,11 +103,14 @@ async def predict_zones(request: PredictionRequest):
         results = await loop.run_in_executor(
             None,  # Use default executor
             evaluator.evaluate,
-            request.sequence.lower() # Pass the sequence from the validated request
+            request.sequence.lower(),  # Pass the sequence from the validated request
+            request.method,  # Pass the prediction method
+            request.max_number_of_predictions,  # Pass max predictions for top_n method
+            request.threshold  # Pass threshold for percentage method
         )
         logger.info("Evaluation complete.")
 
-        # Ensure all expected keys are present in the results, even if empty (GeneticZoneEvaluator should already do this if models are loaded)
+        # Ensure all expected keys are present in the results, even if empty
         final_results = {
             "ei": results.get("ei", []),
             "ie": results.get("ie", []),
@@ -115,7 +118,7 @@ async def predict_zones(request: PredictionRequest):
             "ez": results.get("ez", []),
         }
 
-        logger.info(f"EI types found: {type(final_results['ei'])}, ")
+        logger.info(f"Prediction completed with method {request.method}")
 
         return final_results
 

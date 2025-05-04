@@ -358,11 +358,11 @@ def print_results(results, output_dir="results"):
 if __name__ == "__main__":
     
     model_paths = {
-        # "ei": "../models/ei/combined",
-        # "ie": "../models/ie/combined",
-        # "ez": "../models/ez/combined",
-        # "ze": "../models/ze/combined",
-        # "ze-ez": "../models/ze-ez/ZE-EZ"
+        "ei": "../models/ei/combined",
+        "ie": "../models/ie/combined",
+        "ez": "../models/ez/combined",
+        "ze": "../models/ze/combined",
+        "ze-ez": "../models/ze-ez/ZE-EZ",
         'ei-ie': "../models/ei-ie/EI-IE",
         'ie-ei': "../models/ie-ei/IE-EI",
     }
