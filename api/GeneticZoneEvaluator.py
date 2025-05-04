@@ -39,21 +39,10 @@ class GeneticZoneEvaluator:
         # Get predictions from all models
         all_predictions = []
         for predictor in self.predictor[zone]:
-            preds = predictor.predict(df, decision_threshold=0.85)
-            if isinstance(preds[0], str):
-                preds = [p.lower() == "true" for p in preds]
-            else:
-                preds = [bool(p) for p in preds]
-            all_predictions.append(preds)
-        
-        # Calculate majority vote for each window
-        total = len(self.predictor[zone])
-        final_predictions = []
-        for i in range(len(window_strings)):
-            votes = sum(1 for preds in all_predictions if preds[i])
-            final_predictions.append(votes > total / 2)
-            
-        return final_predictions
+            preds = predictor.predict_proba(df, as_pandas=True)
+            all_predictions = (preds["true"].rank(method="first", ascending=False) <= 10)
+
+        return all_predictions
 
     def _evaluate_ei(self, nucleotide_string):
         """
@@ -78,6 +67,8 @@ class GeneticZoneEvaluator:
             
         if windows:
             predictions = self._predict("ei", windows)
+            print(predictions.shape)
+            print(len(positions))
             return [pos for pos, pred in zip(positions, predictions) if pred]
         return []
 
@@ -102,7 +93,7 @@ class GeneticZoneEvaluator:
                 windows.append(window)
                 positions.append(pos)
             start_index = pos + 1
-            
+
         if windows:
             predictions = self._predict("ie", windows)
             return [pos for pos, pred in zip(positions, predictions) if pred]
@@ -122,7 +113,7 @@ class GeneticZoneEvaluator:
             window = nucleotide_string[i : i + window_size]
             windows.append(window)
             positions.append(i)
-            
+
         if windows:
             predictions = self._predict("ze", windows)
             return [pos for pos, pred in zip(positions, predictions) if pred]
@@ -142,7 +133,7 @@ class GeneticZoneEvaluator:
             window = nucleotide_string[i : i + window_size]
             windows.append(window)
             positions.append(i)
-            
+
         if windows:
             predictions = self._predict("ez", windows)
             return [pos for pos, pred in zip(positions, predictions) if pred]
