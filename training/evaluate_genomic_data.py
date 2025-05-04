@@ -318,10 +318,25 @@ def print_results(results, output_dir="results"):
         # Create confusion matrix
         plt.figure(figsize=(6, 6))
         
-        # Calculate confusion matrix values
-        positive_results = zone_results.get('positive_cases') or zone_results.get('ze_cases') or zone_results.get('ei_cases')
-        negative_results = zone_results.get('negative_cases') or zone_results.get('ez_cases') or zone_results.get('ie_cases')
+        # Determine labels based on zone type
+        if zone == "ei-ie":
+            labels = ["EI", "IE"]
+            positive_results = zone_results.get('ei_cases')
+            negative_results = zone_results.get('ie_cases')
+        elif zone == "ie-ei":
+            labels = ["IE", "EI"]
+            positive_results = zone_results.get('ie_cases')
+            negative_results = zone_results.get('ei_cases')
+        elif zone == "ze-ez":
+            labels = ["ZE", "EZ"]
+            positive_results = zone_results.get('ze_cases')
+            negative_results = zone_results.get('ez_cases')
+        else:
+            labels = ["Positive", "Negative"]
+            positive_results = zone_results.get('positive_cases')
+            negative_results = zone_results.get('negative_cases')
 
+        # Calculate confusion matrix values
         true_positive = positive_results['correct']
         false_positive = negative_results['incorrect']
         false_negative = positive_results['incorrect']
@@ -347,8 +362,8 @@ def print_results(results, output_dir="results"):
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
         plt.title(f'Confusion Matrix - {zone.upper()}')
-        plt.xticks([0, 1], ['Positive', 'Negative'])
-        plt.yticks([0, 1], ['Positive', 'Negative'])
+        plt.xticks([0, 1], labels)
+        plt.yticks([0, 1], labels)
         
         # Adjust layout and save chart
         plt.tight_layout()
