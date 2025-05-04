@@ -169,6 +169,16 @@ def load_and_evaluate_data(model_paths, data_paths, output_path=None):
             test_false_data_df
         ) = extractor.ei_extractor.get_data()
 
+        ei_true["label"] = "ei"
+        ie_true_counter_example_data_df["label"] = "ie"
+
+        results["ei-ie"] = {
+            "ei_cases": evaluate_dataframe(models["ei-ie"], ei_true, "ei-ie"),
+            "ie_cases": evaluate_dataframe(models["ei-ie"], ie_true_counter_example_data_df, "ei-ie")
+        }
+
+    # Evaluate IE-EI zone
+    if "ie-ei" in models:
         (
             ie_true,
             ei_counter_example_data_df,
@@ -179,12 +189,12 @@ def load_and_evaluate_data(model_paths, data_paths, output_path=None):
             test_false_data_df
         ) = extractor.ie_extractor.get_data()
 
-        ei_true["label"] = "ei"
         ie_true["label"] = "ie"
+        ei_true_counter_example_data_df["label"] = "ei"
 
-        results["ei-ie"] = {
-            "ei_cases": evaluate_dataframe(models["ei-ie"], ei_true, "ei-ie"),
-            "ie_cases": evaluate_dataframe(models["ei-ie"], ie_true, "ei-ie")
+        results["ie-ei"] = {
+            "ie_cases": evaluate_dataframe(models["ie-ei"], ie_true, "ie-ei"),
+            "ei_cases": evaluate_dataframe(models["ie-ei"], ei_true_counter_example_data_df, "ie-ei")
         }
     
     return results
@@ -208,7 +218,7 @@ def evaluate_dataframe(model, df, zone):
     if zone in ["ei", "ei-ie"]:
         num_nucleotides = 12
         start_col = 4  # First 4 columns are metadata
-    elif zone in ["ie"]:
+    elif zone in ["ie", "ie-ei"]:
         num_nucleotides = 105
         start_col = 4  # First 4 columns are metadata
     elif zone in ["ze", "ez", "ze-ez"]:
@@ -232,7 +242,7 @@ def evaluate_dataframe(model, df, zone):
     predictions = [p.lower() == "true" for p in preds]
     
     # Compare predictions with labels
-    if zone in ["ze-ez", "ei-ie"]:
+    if zone in ["ze-ez", "ei-ie", "ie-ei"]:
         correct = sum(1 for pred, real_value in zip(preds, labels) if pred.lower() == real_value.lower())
     else:
         correct = sum(1 for pred, real_value in zip(predictions, labels) if pred == real_value)
@@ -354,6 +364,7 @@ if __name__ == "__main__":
         # "ze": "../models/ze/combined",
         # "ze-ez": "../models/ze-ez/ZE-EZ"
         'ei-ie': "../models/ei-ie/EI-IE",
+        'ie-ei': "../models/ie-ei/IE-EI",
     }
     
     data_paths = [

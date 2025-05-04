@@ -200,6 +200,12 @@ class Extraction:
                 "label"]
         )
 
+        ie_ei_true_counter_example.to_csv(
+            f"{self.output_path}/ie/data_ei_true_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + [
+                "label"]
+        )
+
         # Random sample of counter examples
         ie_others = pd.concat([
             ie_ei_counter_example,
