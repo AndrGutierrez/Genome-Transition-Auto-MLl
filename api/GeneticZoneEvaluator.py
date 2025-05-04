@@ -37,10 +37,8 @@ class GeneticZoneEvaluator:
         df = pd.DataFrame(data)
         
         # Get predictions from all models
-        all_predictions = []
-        for predictor in self.predictor[zone]:
-            preds = predictor.predict_proba(df, as_pandas=True)
-            all_predictions = (preds["true"].rank(method="first", ascending=False) <= 10)
+        preds = self.predictor[zone][0].predict_proba(df, as_pandas=True)
+        all_predictions = (preds["true"].rank(method="first", ascending=False) <= 10).to_list()
 
         return all_predictions
 

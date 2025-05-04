@@ -115,6 +115,8 @@ async def predict_zones(request: PredictionRequest):
             "ez": results.get("ez", []),
         }
 
+        logger.info(f"EI types found: {type(final_results['ei'])}, ")
+
         return final_results
 
     except Exception as e:
