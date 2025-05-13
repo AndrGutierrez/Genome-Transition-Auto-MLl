@@ -175,6 +175,12 @@ class Extraction:
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
         )
 
+        # Set ei ie true counter example file
+        ei_ie_true_counter_example.to_csv(
+            f"{self.output_path}/ei/data_ie_true_counter_example.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_End"] + [f"B{i + 1}" for i in range(12)] + ["label"]
+        )
+
         # IE
         if not os.path.exists(self.output_path + '/ie'):
             os.makedirs(self.output_path + '/ie')
@@ -190,6 +196,12 @@ class Extraction:
 
         ie_true.to_csv(
             f"{self.output_path}/ie/data_ie.csv", index=False,
+            header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + [
+                "label"]
+        )
+
+        ie_ei_true_counter_example.to_csv(
+            f"{self.output_path}/ie/data_ei_true_counter_example.csv", index=False,
             header=["GEN_ID", "Chromosome", "Global_Start", "Exon_Start"] + [f"B{i + 1}" for i in range(105)] + [
                 "label"]
         )

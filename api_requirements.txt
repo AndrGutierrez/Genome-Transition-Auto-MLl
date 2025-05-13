@@ -1,0 +1,3 @@
+fastapi
+uvicorn[standard]
+autogluon.tabular[all]==1.2

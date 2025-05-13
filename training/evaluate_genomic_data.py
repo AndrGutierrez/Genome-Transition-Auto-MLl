@@ -131,6 +131,72 @@ def load_and_evaluate_data(model_paths, data_paths, output_path=None):
             "negative_cases": evaluate_dataframe(models["ez"], ez_negative_cases, "ez")
         }
     
+    # Evaluate EZ-ZE zone
+    if "ze-ez" in models:
+        (
+            ze_true,
+            ei_counter_example_data_df,
+            ie_counter_example_data_df,
+            ez_counter_example_data_df,
+            false_data_df
+        ) = extractor.ze_extractor.get_data()
+
+        (
+            ez_true,
+            ei_counter_example_data_df,
+            ie_counter_example_data_df,
+            ez_counter_example_data_df,
+            false_data_df
+        ) = extractor.ez_extractor.get_data()
+
+        ze_true["label"] = "ze"
+        ez_true["label"] = "ez"
+
+        results["ze-ez"] = {
+            "ze_cases": evaluate_dataframe(models["ze-ez"], ze_true, "ze-ez"),
+            "ez_cases": evaluate_dataframe(models["ze-ez"], ez_true, "ze-ez")
+        }
+    
+    # Evaluate EI-IE zone
+    if "ei-ie" in models:
+        (
+            ei_true,
+            ie_counter_example_data_df,
+            ie_true_counter_example_data_df,
+            ez_counter_example_data_df,
+            ze_counter_example_data_df,
+            false_data_df,
+            test_false_data_df
+        ) = extractor.ei_extractor.get_data()
+
+        ei_true["label"] = "ei"
+        ie_true_counter_example_data_df["label"] = "ie"
+
+        results["ei-ie"] = {
+            "ei_cases": evaluate_dataframe(models["ei-ie"], ei_true, "ei-ie"),
+            "ie_cases": evaluate_dataframe(models["ei-ie"], ie_true_counter_example_data_df, "ei-ie")
+        }
+
+    # Evaluate IE-EI zone
+    if "ie-ei" in models:
+        (
+            ie_true,
+            ei_counter_example_data_df,
+            ei_true_counter_example_data_df,
+            ez_counter_example_data_df,
+            ze_counter_example_data_df,
+            false_data_df,
+            test_false_data_df
+        ) = extractor.ie_extractor.get_data()
+
+        ie_true["label"] = "ie"
+        ei_true_counter_example_data_df["label"] = "ei"
+
+        results["ie-ei"] = {
+            "ie_cases": evaluate_dataframe(models["ie-ei"], ie_true, "ie-ei"),
+            "ei_cases": evaluate_dataframe(models["ie-ei"], ei_true_counter_example_data_df, "ie-ei")
+        }
+    
     return results
 
 def evaluate_dataframe(model, df, zone):
@@ -140,7 +206,7 @@ def evaluate_dataframe(model, df, zone):
     Args:
         model (TabularPredictor): AutoGluon model for the zone
         df (pd.DataFrame): DataFrame with data to evaluate
-        zone (str): Zone to evaluate ('ei', 'ie', 'ze', 'ez')
+        zone (str): Zone to evaluate ('ei', 'ie', 'ze', 'ez', 'ze-ez')
     
     Returns:
         dict: Evaluation results
@@ -149,13 +215,13 @@ def evaluate_dataframe(model, df, zone):
         return {"total": 0, "correct": 0, "incorrect": 0, "accuracy": 0.0}
     
     # Determine number of nucleotide columns based on zone
-    if zone == "ei":
+    if zone in ["ei", "ei-ie"]:
         num_nucleotides = 12
         start_col = 4  # First 4 columns are metadata
-    elif zone == "ie":
+    elif zone in ["ie", "ie-ei"]:
         num_nucleotides = 105
         start_col = 4  # First 4 columns are metadata
-    elif zone in ["ze", "ez"]:
+    elif zone in ["ze", "ez", "ze-ez"]:
         num_nucleotides = 550
         start_col = 4  # First 4 columns are metadata
     else:
@@ -170,13 +236,16 @@ def evaluate_dataframe(model, df, zone):
     
     # Get true labels
     labels = df['label'].tolist()
-    
+
     # Get model predictions
     preds = model.predict(nucleotide_df, decision_threshold=0.5)
     predictions = [p.lower() == "true" for p in preds]
     
     # Compare predictions with labels
-    correct = sum(1 for pred, real_value in zip(predictions, labels) if pred == real_value)
+    if zone in ["ze-ez", "ei-ie", "ie-ei"]:
+        correct = sum(1 for pred, real_value in zip(preds, labels) if pred.lower() == real_value.lower())
+    else:
+        correct = sum(1 for pred, real_value in zip(predictions, labels) if pred == real_value)
     incorrect = len(df) - correct
     accuracy = correct / len(df) if len(df) > 0 else 0.0
     
@@ -249,10 +318,25 @@ def print_results(results, output_dir="results"):
         # Create confusion matrix
         plt.figure(figsize=(6, 6))
         
+        # Determine labels based on zone type
+        if zone == "ei-ie":
+            labels = ["EI", "IE"]
+            positive_results = zone_results.get('ei_cases')
+            negative_results = zone_results.get('ie_cases')
+        elif zone == "ie-ei":
+            labels = ["IE", "EI"]
+            positive_results = zone_results.get('ie_cases')
+            negative_results = zone_results.get('ei_cases')
+        elif zone == "ze-ez":
+            labels = ["ZE", "EZ"]
+            positive_results = zone_results.get('ze_cases')
+            negative_results = zone_results.get('ez_cases')
+        else:
+            labels = ["Positive", "Negative"]
+            positive_results = zone_results.get('positive_cases')
+            negative_results = zone_results.get('negative_cases')
+
         # Calculate confusion matrix values
-        positive_results = zone_results['positive_cases']
-        negative_results = zone_results['negative_cases']
-        
         true_positive = positive_results['correct']
         false_positive = negative_results['incorrect']
         false_negative = positive_results['incorrect']
@@ -278,8 +362,8 @@ def print_results(results, output_dir="results"):
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
         plt.title(f'Confusion Matrix - {zone.upper()}')
-        plt.xticks([0, 1], ['Positive', 'Negative'])
-        plt.yticks([0, 1], ['Positive', 'Negative'])
+        plt.xticks([0, 1], labels)
+        plt.yticks([0, 1], labels)
         
         # Adjust layout and save chart
         plt.tight_layout()
@@ -293,6 +377,9 @@ if __name__ == "__main__":
         "ie": "../models/ie/combined",
         "ez": "../models/ez/combined",
         "ze": "../models/ze/combined",
+        "ze-ez": "../models/ze-ez/ZE-EZ",
+        'ei-ie': "../models/ei-ie/EI-IE",
+        'ie-ei': "../models/ie-ei/IE-EI",
     }
     
     data_paths = [
