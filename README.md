@@ -34,14 +34,14 @@ As a final product, the project exposes a **FastAPI** endpoint that returns the 
 | **ZE** | **0.875** |     0.867 |  0.885 |    0.876 |
 | **EZ** | **0.876** |     0.911 |  0.833 |    0.870 |
 
-<details>
-<summary>Confusion matrices – single‑class</summary>
+### Confusion matrices – single‑class
 
-| EI                                            | IE                                            | ZE                                            | EZ                                            |
-| --------------------------------------------- | --------------------------------------------- | --------------------------------------------- | --------------------------------------------- |
-| ![EI CM](docs/images/ei_confusion_matrix.png) | ![IE CM](docs/images/ie_confusion_matrix.png) | ![ZE CM](docs/images/ze_confusion_matrix.png) | ![EZ CM](docs/images/ez_confusion_matrix.png) |
-
-</details>
+| EI                                            | IE                                            |
+| --------------------------------------------- | --------------------------------------------- |
+| ![EI CM](docs/images/ei_confusion_matrix.png) | ![IE CM](docs/images/ie_confusion_matrix.png) |
+| ZE                                            | EZ                                            |
+| --------------------------------------------- | --------------------------------------------- |
+| ![ZE CM](docs/images/ze_confusion_matrix.png) | ![EZ CM](docs/images/ez_confusion_matrix.png) |
 
 ---
 
@@ -53,11 +53,8 @@ As a final product, the project exposes a **FastAPI** endpoint that returns the 
 | **IE vs EI** | **0.992** |           0.992 |        0.992 |    0.992 |
 | **ZE vs EZ** | **0.639** |           0.640 |        0.639 |    0.639 |
 
-<details>
-<summary>Confusion matrices – dual‑class</summary>
+### Confusion matrices – dual‑class
 
 | EI vs IE                                               | IE vs EI                                               | ZE vs EZ                                               |
 | ------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------ |
 | ![EI vs IE CM](docs/images/ei-ie_confusion_matrix.png) | ![IE vs EI CM](docs/images/ie-ei_confusion_matrix.png) | ![ZE vs EZ CM](docs/images/ze-ez_confusion_matrix.png) |
-
-</details>
