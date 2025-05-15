@@ -40,7 +40,6 @@ As a final product, the project exposes a **FastAPI** endpoint that returns the 
 | --------------------------------------------- | --------------------------------------------- |
 | ![EI CM](docs/images/ei_confusion_matrix.png) | ![IE CM](docs/images/ie_confusion_matrix.png) |
 | ZE                                            | EZ                                            |
-| --------------------------------------------- | --------------------------------------------- |
 | ![ZE CM](docs/images/ze_confusion_matrix.png) | ![EZ CM](docs/images/ez_confusion_matrix.png) |
 
 ---
