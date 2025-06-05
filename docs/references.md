@@ -28,7 +28,7 @@ Department of Electronic Engineering
 National Experimental University of Táchira (UNET), Venezuela
 
 Dr. López Prato served as our project advisor, guiding us through the development of the system and providing valuable academic insight. He also provided the **raw genomic data** that we processed and used to train the machine learning models.
-<br>
+
 📎 [LinkedIn](https://www.linkedin.com/in/jose-lopez-prato/)  
 📁 [GitHub](https://github.com/jose-lopez)
 ---
