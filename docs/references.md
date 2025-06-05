@@ -31,6 +31,7 @@ Dr. López Prato served as our project advisor, guiding us through the developme
 
 📎 [LinkedIn](https://www.linkedin.com/in/jose-lopez-prato/)  
 📁 [GitHub](https://github.com/jose-lopez)
+
 ---
 
 ## 🔗 Contact and Attribution
