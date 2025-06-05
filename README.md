@@ -57,3 +57,7 @@ As a final product, the project exposes a **FastAPI** endpoint that returns the 
 | EI vs IE                                               | IE vs EI                                               | ZE vs EZ                                               |
 | ------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------ |
 | ![EI vs IE CM](docs/images/ei-ie_confusion_matrix.png) | ![IE vs EI CM](docs/images/ie-ei_confusion_matrix.png) | ![ZE vs EZ CM](docs/images/ze-ez_confusion_matrix.png) |
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

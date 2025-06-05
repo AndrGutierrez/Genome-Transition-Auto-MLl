@@ -2,12 +2,12 @@
 
 ### 1. Prerequisites
 
-| Requirement | Recommended version                                       | Notes |
-|-------------|-----------------------------------------------------------|-------|
-| **Python**  | 3.11.5 (64‑bit)                                           | AutoGluon 1.2 ships wheels for these versions. <br>Later versions (3.11+) *may* work but are not officially tested. |
-| **Git**     | ≥ 2.30                                                    | For cloning / pulling updates |
-| **curl / Postman** | *Optional*                                                | Handy for testing the `/predict` endpoint |
-| **GPU drivers & CUDA** | *Optional*                                                | AutoGluon can leverage NVIDIA GPUs if CUDA 11.0+ is available |
+| Requirement | Recommended version | Notes |
+|-------------|---------------------|-------|
+| **Python**  | 3.9.5 (64‑bit)      | AutoGluon 1.2 ships wheels for these versions. <br>Later versions (3.11+) *may* work but are not officially tested. |
+| **Git**     | ≥ 2.30              | For cloning / pulling updates |
+| **curl / Postman** | *Optional*          | Handy for testing the `/predict` endpoint |
+| **GPU drivers & CUDA** | *Optional*          | AutoGluon can leverage NVIDIA GPUs if CUDA 11.0+ is available |
 
 ### 2. Clone the repository
 
@@ -20,8 +20,8 @@ cd genomic‑transition‑zones
 ### 3. Create & activate a virtual environment
 
 | OS                       | Command                                                |
-| ------------------------ | ------------------------------------------------------ |
-| **Windows (PowerShell)** | `py -3.10 -m venv .venv`<br>`.\.venv\Scripts\Activate` |
+| ------------------------ |--------------------------------------------------------|
+| **Windows (PowerShell)** | `py -3.9 -m venv .venv`<br>`.\.venv\Scripts\Activate`  |
 | **Linux / macOS**        | `python3 -m venv .venv`<br>`source .venv/bin/activate` |
 
 ### 4. Install dependencies
@@ -44,7 +44,6 @@ uvicorn api.main:app --port 8000 --reload
 ```
 
 * Uvicorn will start FastAPI on **[http://127.0.0.1:8000](http://127.0.0.1:8000)**.
-* Navigate to **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)** to see the interactive Swagger UI.
 
 ---
 

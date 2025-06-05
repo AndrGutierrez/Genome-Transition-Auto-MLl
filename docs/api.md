@@ -125,5 +125,3 @@ Several enhancements are suggested to extend the functionality and usability of 
 * **Multi-Class Model Integration**: Enable the use of dual-class models (e.g., EI vs. IE, ZE vs. EZ) for more refined predictions once their integration is complete.
 * **Batch Processing and File Support**: Extend the API to accept and process batch inputs from files, allowing users to upload files containing multiple sequences for evaluation.
 * **Email Reporting**: Implement features to send processed results directly to users via email, enhancing the automation and usability of the service.
-
-These improvements would make the API more robust and versatile, accommodating a wider range of use cases and user needs.
