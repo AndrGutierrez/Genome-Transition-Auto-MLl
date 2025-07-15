@@ -67,4 +67,4 @@ Expected response (example):
 ```
 
 > The `/predict` endpoint accepts a JSON payload with a single key `sequence` (uppercase/lowercase nucleotides are accepted).
-> A full description of request/response formats will be added in **docs/api.md**.
+> A full description of request/response formats is available at **docs/api.md**.
