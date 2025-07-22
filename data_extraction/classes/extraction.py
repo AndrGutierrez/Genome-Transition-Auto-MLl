@@ -1,10 +1,10 @@
 import re
 import pandas as pd
 
-from data_extraction.classes.ei_extractor import EIExtractor
-from data_extraction.classes.ie_extractor import IEExtractor
-from data_extraction.classes.ze_extractor import ZEExtractor
-from data_extraction.classes.ez_extractor import EZExtractor
+from .ei_extractor import EIExtractor
+from .ie_extractor import IEExtractor
+from .ze_extractor import ZEExtractor
+from .ez_extractor import EZExtractor
 import os
 
 class Extraction:
